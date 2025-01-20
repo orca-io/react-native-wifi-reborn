@@ -1,3 +1,9 @@
+> [!IMPORTANT]
+> - The library has been forked from [Kristian's fork](https://github.com/kristfal/react-native-wifi-reborn) to integrate it into the company's (`orca-io`) repositories for better control and maintainability.
+> - The original library ([react-native-wifi-reborn](https://github.com/JuanSeBestia/react-native-wifi-reborn)) is not actively maintained. Its codebase primarily consists of pull requests from outsourced developers, leading to instability and a lack of thorough testing.
+> - Kristian's forked version has demonstrated stability and reliability in use.
+
+
 # react-native-wifi-reborn
 
 <p align="center">
