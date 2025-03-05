@@ -191,7 +191,22 @@ public class RNWifiModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void setEnabled(final boolean enabled) {
-        wifi.setWifiEnabled(enabled);
+        if (isAndroidTenOrLater()) {
+            openWifiSettings();
+        } else {
+            wifi.setWifiEnabled(enabled);
+        }
+    }
+
+    /**
+     * Use this to open a wifi settings panel.
+     * For Android Q and above.
+     */
+    @ReactMethod
+    public void openWifiSettings() {
+        Intent intent = new Intent(Settings.Panel.ACTION_WIFI);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        this.context.startActivity(intent);
     }
 
     /**
@@ -202,10 +217,11 @@ public class RNWifiModule extends ReactContextBaseJavaModule {
      * @param SSID     name of the network to connect with
      * @param password password of the network to connect with
      * @param isWep    only for iOS
+     * @param isHidden only for Android, use if WiFi is hidden
      * @param promise  to send success/error feedback
      */
     @ReactMethod
-    public void connectToProtectedSSID(@NonNull final String SSID, @NonNull final String password, final boolean isWep, final Promise promise) {
+    public void connectToProtectedSSID(@NonNull final String SSID, @NonNull final String password, final boolean isWep, final boolean isHidden, final Promise promise) {
         if(!assertLocationPermissionGranted(promise)) {
             return;
         }
@@ -215,9 +231,8 @@ public class RNWifiModule extends ReactContextBaseJavaModule {
             return;
         }
 
-
         this.removeWifiNetwork(SSID, promise, () -> {
-            connectToWifiDirectly(SSID, password, promise);
+            connectToWifiDirectly(SSID, password, isHidden, promise);
         });
     }
 
@@ -486,9 +501,9 @@ public class RNWifiModule extends ReactContextBaseJavaModule {
         }
     }
 
-    private void connectToWifiDirectly(@NonNull final String SSID, @NonNull final String password, final Promise promise) {
+    private void connectToWifiDirectly(@NonNull final String SSID, @NonNull final String password, final boolean isHidden, final Promise promise) {
         if (isAndroidTenOrLater()) {
-            connectAndroidQ(SSID, password, promise);
+            connectAndroidQ(SSID, password, isHidden, promise);
         } else {
             connectPreAndroidQ(SSID, password, promise);
         }
@@ -525,8 +540,9 @@ public class RNWifiModule extends ReactContextBaseJavaModule {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
-    private void connectAndroidQ(@NonNull final String SSID, @NonNull final String password, final Promise promise) {
+    private void connectAndroidQ(@NonNull final String SSID, @NonNull final String password, final boolean isHidden, final Promise promise) {
         WifiNetworkSpecifier.Builder wifiNetworkSpecifier = new WifiNetworkSpecifier.Builder()
+                .setIsHiddenSsid(isHidden)
                 .setSsid(SSID);
 
         if (!isNullOrEmpty(password)) {
