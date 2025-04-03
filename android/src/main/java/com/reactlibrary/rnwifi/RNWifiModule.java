@@ -486,6 +486,20 @@ public class RNWifiModule extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    public void supportsStaConcurrency(final Promise promise) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (this.wifi == null) {
+                promise.reject(IsEnabledErrorCodes.couldNotGetWifiManager.toString(), "Failed to initialize the WifiManager.");
+                return;
+            }
+            promise.resolve(this.wifi.isMakeBeforeBreakWifiSwitchingSupported());
+        } else {
+            // STA concurrency is available since Android 12
+            promise.resolve(false);
+        }
+    }
+
     private void connectToWifiDirectly(@NonNull final String SSID, @NonNull final String password, final Promise promise) {
         if (isAndroidTenOrLater()) {
             connectAndroidQ(SSID, password, promise);

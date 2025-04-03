@@ -273,5 +273,10 @@ declare module 'react-native-wifi-reborn' {
      */
     export function openWifiSettingsWithReturn(): Promise<void>
 
+    /**
+     * Method to check if device supports concurrent station (STA) connections for make-before-break wifi to wifi switching
+     */
+    export function supportsStaConcurrency(): Promise<boolean>;
+
     //#endregion
 }
