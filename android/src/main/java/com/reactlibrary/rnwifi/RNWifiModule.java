@@ -493,7 +493,9 @@ public class RNWifiModule extends ReactContextBaseJavaModule {
                 promise.reject(IsEnabledErrorCodes.couldNotGetWifiManager.toString(), "Failed to initialize the WifiManager.");
                 return;
             }
-            promise.resolve(this.wifi.isMakeBeforeBreakWifiSwitchingSupported());
+            // https://developer.android.com/reference/android/net/wifi/WifiManager#isMakeBeforeBreakWifiSwitchingSupported()
+            // https://source.android.com/docs/core/connect/wifi-sta-sta-concurrency#local-only
+            promise.resolve(this.wifi.isStaConcurrencyForLocalOnlyConnectionsSupported());
         } else {
             // STA concurrency is available since Android 12
             promise.resolve(false);
